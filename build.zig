@@ -2,6 +2,15 @@ const std = @import("std");
 
 pub fn build(b: *std.build.Builder) void {
 
+    const src = "src/";
+    const c = [_][]const u8{
+        "-std=c99",
+        "-Wpedantic",
+        "-Wall",
+        "-Wextra",
+        "-Wshadow",
+    };
+
     const target = b.standardTargetOptions(.{});
 
     const optimize = b.standardOptimizeOption(.{});
@@ -12,6 +21,12 @@ pub fn build(b: *std.build.Builder) void {
         .optimize = optimize,
         .target = target,
     });
+
+    exe.addCSourceFiles(&.{
+        src ++ "c_example.c",
+    }, &c);
+    exe.linkSystemLibrary("c");
+    exe.addIncludePath("src");
 
     b.installArtifact(exe);
 
@@ -31,6 +46,13 @@ pub fn build(b: *std.build.Builder) void {
         .target = target,
         .optimize = optimize,
     });
+
+    exe_tests.addCSourceFiles(&.{
+        src ++ "c_example.c",
+    }, &c);
+    exe_tests.linkSystemLibrary("c");
+    exe_tests.addIncludePath("src");
+
 
     const run_exe_tests = b.addRunArtifact(exe_tests);
 
